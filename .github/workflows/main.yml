@@ -3,34 +3,39 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger the pipeline when code is pushed to the `main` branch
+      - main  # Trigger on push to main branch
   pull_request:
     branches:
-      - main  # Trigger the pipeline on pull requests to the `main` branch
+      - main  # Trigger on pull request to main branch
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # The environment to run the workflow on
+    runs-on: ubuntu-latest  # Run on Ubuntu
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2  # Check out the code from the GitHub repository
+        uses: actions/checkout@v2
+
+      - name: Navigate to Project Directory
+        working-directory: Docker-web-app  # Specify the directory with the Dockerfile
+        run: ls -la  # List files to confirm correct directory
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1  # Set up Docker Buildx for advanced features
+        uses: docker/setup-buildx-action@v1
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # Your DockerHub username stored in GitHub Secrets
-          password: ${{ secrets.DOCKER_PASSWORD }}  # Your DockerHub password stored in GitHub Secrets
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
+        working-directory: Docker-web-app
         run: |
-          docker build -t my-nginx-app:$GITHUB_SHA .  # Build the Docker image with the commit hash
-          docker tag my-nginx-app:$GITHUB_SHA myapp:latest  # Tag the image as `latest`
-          docker push my-nginx-app:$GITHUB_SHA  # Push the image to DockerHub
-          docker push my-nginx-app:latest  # Push the `latest` tag
+          docker build -t my-nginx-app:$GITHUB_SHA .  # Build image
+          docker tag my-nginx-app:$GITHUB_SHA my-nginx-app:latest
+          docker push my-nginx-app:$GITHUB_SHA
+          docker push my-nginx-app:latest
 
   deploy:
     needs: build
@@ -43,12 +48,12 @@ jobs:
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret access key
-          region: us-east-1  # Specify your AWS region
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: us-east-1
 
-      - name: Deploy to AWS ECS (Elastic Container Service)
+      - name: Deploy to AWS ECS
         run: |
           aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment
         env:
-          AWS_REGION: us-east-1  # AWS region
+          AWS_REGION: us-east-1
