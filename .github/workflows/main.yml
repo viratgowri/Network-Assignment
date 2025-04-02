@@ -25,12 +25,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}  # Your DockerHub username stored in GitHub Secrets
           password: ${{ secrets.DOCKER_PASSWORD }}  # Your DockerHub password stored in GitHub Secrets
 
-      - name: Build and push Docker image
+      - name: Build Docker image
         run: |
-          docker build -t myapp:$GITHUB_SHA .  # Build the Docker image with the commit hash
-          docker tag myapp:$GITHUB_SHA myapp:latest  # Tag the image as `latest`
-          docker push myapp:$GITHUB_SHA  # Push the image to DockerHub
-          docker push myapp:latest  # Push the `latest` tag
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp:$GITHUB_SHA .  # Build the Docker image with the commit hash
+          docker tag ${{ secrets.DOCKER_USERNAME }}/myapp:$GITHUB_SHA ${{ secrets.DOCKER_USERNAME }}/myapp:latest  # Tag the image as `latest`
+
+      - name: Push Docker image to DockerHub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:$GITHUB_SHA  # Push the image to DockerHub with commit hash
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest  # Push the `latest` tag
 
   deploy:
     needs: build
