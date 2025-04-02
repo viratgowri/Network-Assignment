@@ -51,4 +51,4 @@ jobs:
 
       - name: Deploy to AWS ECS (Elastic Container Service)
         run: |
-          aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment
+          aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment --region eu-west-1
