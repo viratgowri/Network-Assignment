@@ -27,10 +27,10 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t myapp:$GITHUB_SHA .  # Build the Docker image with the commit hash
-          docker tag myapp:$GITHUB_SHA myapp:latest  # Tag the image as `latest`
-          docker push myapp:$GITHUB_SHA  # Push the image to DockerHub
-          docker push myapp:latest  # Push the `latest` tag
+          docker build -t my-nginx-app:$GITHUB_SHA .  # Build the Docker image with the commit hash
+          docker tag my-nginx-app:$GITHUB_SHA myapp:latest  # Tag the image as `latest`
+          docker push my-nginx-app:$GITHUB_SHA  # Push the image to DockerHub
+          docker push my-nginx-app:latest  # Push the `latest` tag
 
   deploy:
     needs: build
