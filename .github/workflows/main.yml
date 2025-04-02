@@ -47,7 +47,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret access key
-          region: us-east-1  # Specify your AWS region
+          region: eu-west-1  # Specify your AWS region
 
       - name: Deploy to AWS ECS (Elastic Container Service)
         run: |
