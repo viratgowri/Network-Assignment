@@ -1,0 +1,41 @@
+---
+- name: Install Docker and configure it to start on boot
+  hosts: WebApp-EC2
+  become: yes
+  tasks:
+    - name: Remove conflicting curl-minimal package
+      yum:
+        name: curl-minimal
+        state: absent
+
+    - name: Install necessary packages (curl, gnupg)
+      yum:
+        name:
+          - curl
+          - gnupg
+        state: present
+
+    - name: Add Docker’s official GPG key
+      shell: curl -fsSL https://download.docker.com/linux/amazon/amazonlinux/2/gpg | sudo tee /etc/yum.repos.d/docker.gpg > /dev/null
+
+    - name: Set up Docker repository for Amazon Linux
+      shell: echo -e "[docker-ce]\nname=Docker CE Stable Repository\nbaseurl=https://download.docker.com/linux/amazon/amazonlinux/2/stable/x86_64\ngpgcheck=1\ngpgkey=https://download.docker.com/linux/amazon/amazonlinux/2/gpg" | sudo tee /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+
+    - name: Show Docker version
+      debug:
+        var: docker_version.stdout
