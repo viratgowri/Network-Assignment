@@ -42,9 +42,9 @@ jobs:
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.AWS_EC2_HOST }}
+          host: ${{ secrets.AWS_ACCESS_KEY_ID }}
           username: ubuntu
-          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           script: |
             echo "Pulling latest Docker image..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/myapp:latest
